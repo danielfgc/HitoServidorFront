@@ -11,9 +11,4 @@ public class Category {
 
     private List<Review> reviews;
 
-    public Category(int id, String category, List<Review> reviews) {
-        this.id = id;
-        this.category = category;
-        this.reviews = reviews;
-    }
 }

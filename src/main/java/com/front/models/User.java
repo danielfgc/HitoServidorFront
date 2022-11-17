@@ -12,11 +12,5 @@ public class User {
     private String password;
     private List<Review> reviews;
 
-    public User(int id, String username, String email, String password, List<Review> reviews) {
-        this.id = id;
-        this.username = username;
-        this.email = email;
-        this.password = password;
-        this.reviews = reviews;
-    }
+
 }
