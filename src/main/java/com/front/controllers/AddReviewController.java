@@ -15,14 +15,25 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 
 @Controller
 public class AddReviewController {
 
     @RequestMapping("/Add-review")
-    public ModelAndView addreview(ModelAndView mv, HttpServletRequest req){
+    public ModelAndView addreview(ModelAndView mv, HttpServletResponse res){
         mv.addObject("review", new Review());
         mv.addObject("categories", GetCategories.getCategories());
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE");
+        res.setHeader("Access-Control-Max-Age", "3600");
+        res.setHeader("Access-Control-Allow-Headers", "x-requested-with, authorization, content-type");
         mv.setViewName("addreview");
         return mv;
     }
@@ -31,18 +42,28 @@ public class AddReviewController {
                     MediaType.APPLICATION_ATOM_XML_VALUE,
                     MediaType.APPLICATION_JSON_VALUE
             })
-    public @ResponseBody ModelAndView saveReview(ModelAndView mv,HttpServletRequest req, Review request){
+    public @ResponseBody ModelAndView saveReview(ModelAndView mv, HttpServletRequest req, Review review, HttpServletResponse res) throws URISyntaxException, IOException, InterruptedException {
         String url = "http://localhost:8082/api/reviews";
-        request.setUser((Integer) req.getSession().getAttribute("idUser"));
-        request.setCategory((Integer) request.getCategory());
-        request.setLikes(0);
-        request.setDislikes(0);
+        review.setUser((Integer) req.getSession().getAttribute("idUser"));
+        review.setCategory((Integer) review.getCategory());
+        review.setLikes(0);
+        review.setDislikes(0);
+        Gson gson = new Gson();
+/*
+        HttpClient client = HttpClient.newHttpClient();
+        HttpRequest request = HttpRequest.newBuilder()
+                .setHeader("Authorization", "authToken:"+req.getSession().getAttribute("TOKEN"))
+                .uri(new URI(url))
+                .POST(HttpRequest.BodyPublishers.ofString(gson.toJson(review)))
+                .build();
+        HttpResponse<String> response = client.send(request,HttpResponse.BodyHandlers.ofString());*/
+        req.setAttribute("Authorization","authToken:"+req.getSession().getAttribute("TOKEN"));
         HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization","authToken:"+req.getSession().getAttribute("TOKEN"));
+        headers.add(HttpHeaders.AUTHORIZATION,"authToken:"+req.getSession().getAttribute("TOKEN"));
+        headers.setBearerAuth("authToken: "+req.getSession().getAttribute("TOKEN"));
         headers.setContentType(MediaType.APPLICATION_JSON);
         RestTemplate restTemplate = new RestTemplate();
-        Gson gson = new Gson();
-        HttpEntity<String> entity = new HttpEntity<>(gson.toJson(request), headers);
+        HttpEntity<String> entity = new HttpEntity<>(gson.toJson(review), headers);
         restTemplate.postForObject(url, entity,String.class);
         mv.setViewName("addreview");
         return mv;
