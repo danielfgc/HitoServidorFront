@@ -1,6 +1,7 @@
 package com.front.controllers;
 
 import com.front.models.RegisterUser;
+import com.front.models.auth.AuthRequest;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -27,6 +28,13 @@ public class RegisterController {
         String url = "http://localhost:8082/api/register";
         RestTemplate restTemplate = new RestTemplate();
         String respuesta = restTemplate.postForObject(url, request,String.class);
+
+        if(respuesta.equals("user created")){
+            mv.addObject("authRequest", new AuthRequest());
+            mv.addObject("registerMessage",respuesta);
+            mv.setViewName("login");
+            return mv;
+        }
         mv.addObject("respuesta",respuesta);
         mv.setViewName("Register");
         return mv;

@@ -4,9 +4,9 @@ import lombok.Data;
 
 @Data
 public class Review {
-    private int id;
-    private int user;
-    private int category;
+    private Integer id;
+    private int iduser;
+    private int idcategory;
     private String title;
     private String body;
     private float valoration;

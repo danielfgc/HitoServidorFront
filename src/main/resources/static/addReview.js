@@ -25,9 +25,9 @@ function addReview() {
         };
         let options = {
             method: 'POST',
-            mode: "no-cors",
             headers: {
-                "Authorization": "authToken: " + token,
+                Authorization: "authToken: " + token,
+
             },
             body: JSON.stringify(data),
         };
